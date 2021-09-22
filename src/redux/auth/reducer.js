@@ -1,23 +1,22 @@
 import types from './types';
-
-const tokenName = 'vy5kyuh3i55gk6b74il3ig8hughlnoid088078vf8od';
+import pj from '../../../package.json';
 
 const initState = {
-    token: window.localStorage.getItem(tokenName),
+    token: window.localStorage.getItem(pj.tokenKey),
     user: null
 }
 
 const authReducer = (state = initState, action) => {
     switch(action.type){
         case types.SET_TOKEN: {
-            window.localStorage.setItem(tokenName, action.token);
+            window.localStorage.setItem(pj.tokenKey, action.token);
             return {
                 ...state,
                 token: action.token
             }
         }
         case types.REM_TOKEN: {
-            window.localStorage.removeItem(tokenName);
+            window.localStorage.removeItem(pj.tokenKey);
             return {
                 ...state,
                 token: null

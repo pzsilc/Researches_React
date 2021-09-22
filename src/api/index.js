@@ -5,132 +5,175 @@ const API = packageJson.backendUrl + '/api';
 
 
 
-const login = (email, password) => new Promise((resolve, reject) => {
-    axios.post(API + '/auth/login/', toFormData({
-        email,
-        password
-    }), {
+const login = (email, token) => new Promise((resolve, reject) => {
+    axios.post(API + '/auth/login/', toFormData({ email, token }), {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
     })
-    .then(res => {
-        console.log(res)
-        resolve(res.data)
+    .then(res => resolve(res.data))
+    .catch(reject)
+})
+
+
+
+const logout = token => new Promise((resolve, reject) => {
+    axios.post(API + '/auth/logout/', {}, {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
     })
+    .then(res => resolve(res.data))
+    .catch(reject)
+})
+
+
+
+const getUserInfo = token => new Promise((resolve, reject) => {
+    axios.get(API + '/user/get-user/', {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(res => resolve(res.data))
+    .catch(reject)
+})
+
+
+
+const getUserEmployees = token => new Promise((resolve, reject) => {
+    axios.get(API + '/user/get-employees/', {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(res => resolve(res.data.data))
+    .catch(reject)
+})
+
+
+
+const getUserOutcomes = token => new Promise((resolve, reject) => {
+    axios.get(API + '/user/get-outcomes/', {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(res => resolve(res.data.data))
+    .catch(reject)
+})
+
+
+
+const getAllUsers = (token, search) => new Promise((resolve, reject) => {
+    axios.get(API + '/admin/get-users/?search=' + search, {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(res => resolve(res.data.data))
     .catch(err => {
-        console.log(err.response)
+        console.log(err.response);
         reject(err)
     })
 })
 
 
 
-const logout = token => new Promise((resolve, reject) => {
-    axios.post(API + '/auth/logout/', {
+const getAllOutcomes = token => new Promise((resolve, reject) => {
+    axios.get(API + '/admin/get-outcomes/', {
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => resolve(res.data))
-    .catch(err => reject(err))
+    .then(res => resolve(res.data.data))
+    .catch(reject)
 })
 
 
 
-const getUserInfo = token => new Promise((resolve, reject) => {
-    axios.get(API + '/auth/user/', {
+const generateNewRe = (token, employeeId) => new Promise((resolve, reject) => {
+    axios.post(API + '/admin/researches/generate/', toFormData({ employeeId }), {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(res => resolve(res.data))
+    .catch(reject)
+})
+
+
+
+const getUserResearches = token => new Promise((resolve, reject) => {
+    axios.get(API + '/user/get-active-researches/', {
         headers: {
             'Authorization': `Token ${token}`
         }
     })
     .then(res => {
-        resolve(res)
+        resolve(res.data.data)
     })
-    .catch(err => reject(err))
+    .catch(reject)
 })
 
 
 
-const getDrugstories = token => new Promise((resolve, reject) => {
-    axios.get(API + '/drugstores/', {
+const getAnswers = (token, id) => new Promise((resolve, reject) => {
+    axios.get(API + '/researches/' + id + '/answers/', {
         headers: {
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => res.data.data)
-    .then(res => resolve(res))
-    .catch(err => reject(err))
-})
-
-
-
-const getDrugstoreDetails = (token, id) => new Promise((resolve, reject) => {
-    axios.get(API + '/drugstores/' + id + '/', {
-        headers: {
-            'Authorization': `Token ${token}`
-        }
+    .then(res => resolve(res.data.data))
+    .catch(err => {
+        console.log(err.response.data)
+        reject(err)
     })
-    .then(res => res.data)
-    .then(res => resolve(res))
-    .catch(err => reject(err))
 })
 
 
 
-const createDrugstore = (token, data) => new Promise((resolve, reject) => {
-    axios.post(API + '/drugstores/', toFormData(data), {
+const getQuestions = () => new Promise((resolve, reject) => {
+    axios.get(API + '/researches/questions/')
+    .then(res => resolve(res.data.data))
+    .catch(reject)
+})
+
+
+
+const getReasons = () => new Promise((resolve, reject) => {
+    axios.get(API + '/researches/reasons/')
+    .then(res => resolve(res.data.data))
+    .catch(reject)
+})
+
+
+
+const updateResearch = (token, id, data) => new Promise((resolve, reject) => {
+    axios.patch(API + `/researches/${id}/`, data, {
         headers: {
+            'Authorization': `Token ${token}`,
             'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
+            'Accept': 'application/json'
         }
     })
-    .then(res => res.data)
-    .then(res => resolve(res))
-    .catch(err => reject(err))
+    .then(res => resolve(res.data))
+    .catch(reject)
 })
 
 
 
-const createSchedule = (token, name, file, drugstore) => new Promise((resolve, reject) => {
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-        axios.post(API + '/schedules/', toFormData({
-            name,
-            file_input: reader.result,
-            drugstore
-        }), {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Accept': 'application/json',
-                'Authorization': `Token ${token}`
-            }
-        })
-        .then(res => res.data)
-        .then(res => resolve(res))
-        .catch(err => {
-            console.log(err.response);
-            reject(err);
-        })
-    }
-    reader.onerror = err => reject(err);
-})
-
-
-
-const deleteSchedule = (token, id) => new Promise((resolve, reject) => {
-    axios.delete(API + '/schedules/' + id + '/', {
+const getOutcomeBase64 = (token, outcomeId) => new Promise((resolve, reject) => {
+    axios.post(API + '/admin/get-pdf', toFormData({ outcomeId }), {
         headers: {
-            'Authorization': `Token ${token}`
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         }
     })
-    .then(res => {console.log(res); return res.data})
-    .then(res => resolve(res))
-    .catch(err => reject(err))
+    .then(res => resolve(res.data.data))
+    .catch(reject)
 })
 
 
@@ -140,9 +183,15 @@ export {
     login,
     logout,
     getUserInfo,
-    getDrugstories,
-    getDrugstoreDetails,
-    createDrugstore,
-    createSchedule,
-    deleteSchedule
+    getUserEmployees,
+    getUserOutcomes,
+    getQuestions,
+    getReasons,
+    getUserResearches,
+    updateResearch,
+    getAnswers,
+    getAllUsers,
+    getAllOutcomes,
+    generateNewRe,
+    getOutcomeBase64
 }

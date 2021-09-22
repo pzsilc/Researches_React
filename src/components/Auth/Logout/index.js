@@ -10,7 +10,7 @@ const Logout = props => {
         .then(res => {
             console.log(res);
             props.removeToken();
-            window.location.replace('/grafiki/login');
+            window.location.replace('/research/login');
         })
         .catch(err => {
             console.log(err);
@@ -20,11 +20,6 @@ const Logout = props => {
     return null;
 }
 
-const mapDispatchToProps = dispatch => ({
-    removeToken: () => dispatch(authActions.remToken())
-})
-
-export const LogoutContainer = connect(
-    null,
-    mapDispatchToProps
-)(Logout)
+const mapStateToProps = state => ({ token: state.auth.token })
+const mapDispatchToProps = dispatch => ({ removeToken: () => dispatch(authActions.remToken()) })
+export const LogoutContainer = connect(mapStateToProps, mapDispatchToProps)(Logout)

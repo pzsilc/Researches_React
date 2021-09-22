@@ -5,3 +5,24 @@
 #ReactSimpleImageViewer{
     z-index: 10000000000;
 }
+
+.form-control{
+    border: 1px solid #e0e0e0;
+    padding: 5px;
+}
+
+textarea.form-control{
+    width: 400px;
+    height: 100px;
+}
+
+main{
+    position: relative;
+    width: 90%;
+    max-width: 1300px;
+    margin: 0 auto;
+    top: -1100px;
+    background: white;
+    z-index: 1000;
+    padding: 40px;
+}
